@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моніторинг завдань • 8 Клас</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation & Statistics -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                    <div class="logo-text">
+                        <div class="grade-title-container">
+                            <h1 id="grade-title" title="Натисніть для редагування">Екстернат 8-А</h1>
+                            <button id="edit-grade-btn" class="icon-btn-inline" title="Редагувати назву класу"><i class="fa-solid fa-pen-to-square"></i></button>
+                        </div>
+                        <span>Навчальний дашборд</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats Widget -->
+            <div class="stats-panel">
+                <h3>Статистика навчання</h3>
+                
+                <div class="stat-card urgent" id="stat-urgent-btn">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="count-urgent">0</span>
+                        <span class="stat-label">Термінові (до 24 год)</span>
+                    </div>
+                </div>
+
+                <div class="stat-card active" id="stat-active-btn">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="count-pending">0</span>
+                        <span class="stat-label">Очікують виконання</span>
+                    </div>
+                </div>
+
+                <div class="stat-card completed" id="stat-completed-btn">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="count-completed">0</span>
+                        <span class="stat-label">Успішно виконано</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Quick Filters -->
+            <div class="quick-filters">
+                <h3>Швидкі фільтри</h3>
+                <ul class="filter-list" id="subject-filters">
+                    <li class="active" data-filter="all">
+                        <i class="fa-solid fa-list-check"></i> Всі предмети
+                    </li>
+                    <li data-filter="pending">
+                        <i class="fa-regular fa-clock"></i> Тільки активні
+                    </li>
+                    <li data-filter="completed">
+                        <i class="fa-solid fa-check-double"></i> Тільки виконані
+                    </li>
+                    <li data-filter="no_task">
+                        <i class="fa-solid fa-face-smile"></i> Без завдань
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Data Management Panel -->
+            <div class="data-management">
+                <h3>Керування даними</h3>
+                <button class="btn btn-secondary btn-sidebar" id="sidebar-share-btn">
+                    <i class="fa-solid fa-share-nodes"></i> Поділитися розкладом
+                </button>
+                <button class="btn btn-secondary btn-sidebar" id="sidebar-export-btn">
+                    <i class="fa-solid fa-file-export"></i> Експорт розкладу
+                </button>
+                <button class="btn btn-secondary btn-sidebar" id="sidebar-import-btn">
+                    <i class="fa-solid fa-file-import"></i> Імпорт розкладу
+                </button>
+                <input type="file" id="file-import-input" accept=".json" style="display: none;">
+                <button class="btn btn-secondary btn-sidebar btn-danger-text" id="sidebar-reset-btn">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Скинути дашборд
+                </button>
+            </div>
+
+            <!-- User Info / Motivational Footer -->
+            <div class="sidebar-footer">
+                <div class="motivation-quote">
+                    <i class="fa-solid fa-quote-left"></i>
+                    <p id="motivational-quote">Успіх приходить до тих, хто планує свій час!</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navigation / Search & Controls -->
+            <header class="top-nav">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Шукати предмет, вчителя чи завдання...">
+                </div>
+
+                <div class="controls-group">
+                    <div class="sort-selector">
+                        <i class="fa-solid fa-arrow-down-wide-short sort-icon"></i>
+                        <select id="sort-select">
+                            <option value="deadline-asc">Спочатку термінові</option>
+                            <option value="deadline-desc">Спочатку пізні дедлайни</option>
+                            <option value="subject-asc">За назвою предмета</option>
+                        </select>
+                    </div>
+
+                    <button class="theme-toggle" id="theme-toggle-btn" title="Перемикач теми">
+                        <i class="fa-solid fa-sun icon-sun"></i>
+                        <i class="fa-solid fa-moon icon-moon"></i>
+                    </button>
+
+                    <button class="btn btn-primary" id="add-task-btn">
+                        <i class="fa-solid fa-plus"></i> Нове завдання
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Body -->
+            <div class="dashboard-body">
+                <div class="section-title">
+                    <h2 id="current-filter-title">Всі завдання та тести</h2>
+                    <span class="task-counter" id="visible-tasks-count">Усього предметів: 0</span>
+                </div>
+
+                <!-- Grid of Task Cards -->
+                <div class="tasks-grid" id="tasks-grid">
+                    <!-- Cards will be dynamically inserted here via JS -->
+                </div>
+
+                <!-- Empty State Template -->
+                <div class="empty-state hidden" id="empty-state">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='120' height='120'><circle cx='100' cy='100' r='80' fill='%232a2c3a' /><path d='M70,85 C75,85 75,75 70,75 C65,75 65,85 70,85 Z M130,85 C135,85 135,75 130,75 C125,75 125,85 130,85 Z' fill='%236c5dd3'/><path d='M70,120 Q100,150 130,120' stroke='%236c5dd3' stroke-width='8' stroke-linecap='round' fill='none'/></svg>" alt="Немає результатів">
+                    <h3>Завдань не знайдено</h3>
+                    <p>Спробуйте змінити фільтри або критерії пошуку.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: View Task Details -->
+    <div class="modal-overlay" id="view-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="view-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <div class="subject-badge-container">
+                    <span class="subject-tag" id="view-subject-tag">Предмет</span>
+                </div>
+                <h2 id="view-task-title">Контрольна робота</h2>
+                <div class="teacher-info">
+                    <i class="fa-solid fa-user-tie"></i> Вчитель: <strong id="view-teacher-name">Ім'я</strong>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <h4><i class="fa-solid fa-file-invoice"></i> Опис та зміст завдання</h4>
+                    <p id="view-task-desc" class="task-description-full">Детальний опис...</p>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Термін здачі (Дедлайн)</span>
+                        <span class="info-value" id="view-deadline-date">24 травня 2026</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Формат здачі роботи</span>
+                        <span class="info-value accent-value" id="view-format-badge">Google Форма</span>
+                    </div>
+                    <div class="info-item full-width" id="view-countdown-container">
+                        <span class="info-label">Часу залишилось</span>
+                        <div class="countdown-timer-large" id="view-countdown">00д 00г 00хв 00с</div>
+                    </div>
+                </div>
+
+                <div class="detail-section" id="view-links-section">
+                    <h4><i class="fa-solid fa-link"></i> Прикріплені матеріали</h4>
+                    <div class="attachments-list" id="view-attachments">
+                        <!-- Links generated dynamically -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" target="_blank" class="btn btn-secondary btn-classroom" id="view-classroom-btn" style="display: none;"><i class="fa-solid fa-chalkboard-user"></i> Відкрити в Classroom</a>
+                <button class="btn btn-secondary" id="view-edit-btn"><i class="fa-solid fa-pen"></i> Редагувати</button>
+                <button class="btn btn-primary" id="view-complete-btn"><i class="fa-solid fa-circle-check"></i> Позначити як виконано</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add / Edit Task -->
+    <div class="modal-overlay" id="form-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="form-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h2 id="form-modal-title">Додати нове завдання</h2>
+                <p class="subtitle">Введіть параметри контрольної роботи або тесту</p>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="form-task-id">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="form-subject">Назва предмета <span class="required">*</span></label>
+                        <input type="text" id="form-subject" required placeholder="Наприклад: Алгебра, Хімія">
+                    </div>
+                    <div class="form-group">
+                        <label for="form-teacher">Вчитель (ПІБ) <span class="required">*</span></label>
+                        <input type="text" id="form-teacher" required placeholder="Наприклад: Білоус І.Г.">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-title">Заголовок завдання <span class="required">*</span></label>
+                    <input type="text" id="form-title" required placeholder="Наприклад: Контрольна робота №4, Тестування за рік">
+                </div>
+
+                <div class="form-group">
+                    <label for="form-desc">Зміст завдання / Опис <span class="required">*</span></label>
+                    <textarea id="form-desc" rows="4" required placeholder="Детально опишіть, що потрібно здати, які параграфи прочитати чи які номери виконати..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="form-deadline">Кінцевий термін (Дедлайн) <span class="optional">(залиште пустим, якщо немає завдань)</span></label>
+                        <input type="datetime-local" id="form-deadline">
+                    </div>
+                    <div class="form-group">
+                        <label for="form-format">Формат здачі роботи</label>
+                        <input type="text" id="form-format" placeholder="Наприклад: Google Форма, Фото зошита, PDF">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-classroom-url">Посилання на Google Classroom</label>
+                    <input type="text" id="form-classroom-url" placeholder="https://classroom.google.com/c/...">
+                </div>
+
+                <div class="form-group">
+                    <label>Корисні посилання (необов'язково)</label>
+                    <div id="form-links-container">
+                        <!-- Dynamic Link Inputs -->
+                    </div>
+                    <button type="button" class="btn btn-text" id="add-link-field-btn">
+                        <i class="fa-solid fa-plus-circle"></i> Додати посилання
+                    </button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="form-cancel-btn">Скасувати</button>
+                    <button type="submit" class="btn btn-primary" id="form-submit-btn">Зберегти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- WELCOME / FIRST RUN SETUP OVERLAY -->
+    <div class="welcome-overlay" id="welcome-overlay" style="display: none;">
+        <div class="welcome-card">
+            <i class="fa-solid fa-graduation-cap welcome-logo-icon"></i>
+            <h2>Ласкаво просимо до планувальника!</h2>
+            <p class="welcome-subtitle">Універсальний дашборд контрольних та тестових завдань для будь-якого класу.</p>
+            
+            <div class="setup-modes">
+                <div class="setup-mode-card" id="mode-demo-btn">
+                    <div class="setup-mode-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <h3>Спробувати демо (8-А клас)</h3>
+                    <p>Завантажити реальну навчальну програму 8-го класу (з інформатикою, українською мовою, хімією тощо), щоб вивчити роботу додатку.</p>
+                </div>
+                
+                <div class="setup-mode-card" id="mode-blank-btn">
+                    <div class="setup-mode-icon"><i class="fa-solid fa-folder-plus"></i></div>
+                    <h3>Створити новий клас</h3>
+                    <p>Почати з чистого аркуша для вашого унікального класу, школи або предметів.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Edit Grade Title -->
+    <div class="modal-overlay" id="grade-modal">
+        <div class="modal-card compact-modal">
+            <button class="modal-close" id="grade-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h2>Редагувати назву класу</h2>
+                <p class="subtitle">Введіть нову назву для вашого дашборду</p>
+            </div>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="form-grade-name">Назва класу/програми</label>
+                <input type="text" id="form-grade-name" required placeholder="Наприклад: 9-Б Клас, Екстернат 10-А">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="grade-cancel-btn">Скасувати</button>
+                <button class="btn btn-primary" id="grade-submit-btn">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Share Dashboard Links -->
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal-card">
+            <button class="modal-close" id="share-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h2>Поділитися розкладом</h2>
+                <p class="subtitle">Будь-хто, хто відкриє це посилання, отримає копію вашого розкладу із завданнями та налаштуваннями!</p>
+            </div>
+            <div class="share-box-content" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                <p class="share-info-text" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">Скопіюйте посилання нижче та надішліть його іншим батькам або однокласникам через Viber, Telegram тощо. Вони отримають повністю налаштований дашборд.</p>
+                <div class="share-link-input-group" style="display: flex; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <input type="text" id="share-link-input" readonly style="flex: 1; background: transparent; border: none; padding: 0.5rem; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; outline: none;">
+                    <button class="btn btn-primary" id="share-copy-btn" style="padding: 0.5rem 1rem;"><i class="fa-solid fa-copy"></i> Копіювати</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Import Confirmation -->
+    <div class="modal-overlay" id="import-confirm-modal">
+        <div class="modal-card compact-modal" style="text-align: center;">
+            <div class="modal-header">
+                <i class="fa-solid fa-cloud-arrow-down" style="font-size: 3rem; color: var(--primary); margin: 0.5rem auto 1rem; display: block; filter: drop-shadow(0 2px 10px rgba(108, 93, 211, 0.3));"></i>
+                <h2>Знайдено новий розклад!</h2>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+                <p class="import-confirm-text" style="font-size: 0.95rem; color: var(--text-secondary);">Ви перейшли за шеринг-посиланням. Бажаєте імпортувати дашборд для класу:</p>
+                <h3 id="import-class-name" style="font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">Назва класу</h3>
+                <p class="import-confirm-warning" style="font-size: 0.8rem; color: var(--warning); display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation"></i> Увага! Це замінить ваш поточний розклад у цьому браузері.</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; gap: 1rem; border-top: none; padding-top: 0.5rem;">
+                <button class="btn btn-secondary" id="import-cancel-btn" style="min-width: 100px;">Відхилити</button>
+                <button class="btn btn-primary" id="import-accept-btn" style="min-width: 140px;">Імпортувати</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-info-circle toast-icon"></i>
+        <span id="toast-message">Повідомлення</span>
+    </div>
+
+    <!-- Main JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
