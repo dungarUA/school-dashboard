@@ -385,18 +385,28 @@ function getRemainingTime(deadlineStr, taskStatus) {
     return { label: `Залишилось: ${timeString}`, cls: cls, totalMs: diff };
 }
 
-// Formatting readable dates
+// Formatting readable dates to custom dd/mm/yyyy format
+function formatCustomDate(dateStr, includeTime = false) {
+    if (!dateStr) return "Немає";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "Немає";
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    if (includeTime) {
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year}, ${hours}:${minutes}`;
+    }
+    
+    return `${day}/${month}/${year}`;
+}
+
 function formatDeadlineToKyiv(deadlineStr) {
     if (!deadlineStr) return "Термін здачі не вказано";
-    const date = new Date(deadlineStr);
-    const options = { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    };
-    return date.toLocaleDateString('uk-UA', options);
+    return formatCustomDate(deadlineStr, true);
 }
 
 // ==========================================================================
@@ -513,6 +523,8 @@ function renderTasks() {
             return new Date(b.deadline) - new Date(a.deadline);
         } else if (currentSort === 'subject-asc') {
             return a.subject.localeCompare(b.subject, 'uk');
+        } else if (currentSort === 'subject-desc') {
+            return b.subject.localeCompare(a.subject, 'uk');
         }
         return 0;
     });
@@ -578,7 +590,7 @@ function renderTasks() {
 
             <div class="card-footer">
                 <div class="time-remaining">
-                    <span class="timer-label">Дедлайн: ${task.deadline ? new Date(task.deadline).toLocaleDateString('uk-UA') : 'Немає'}</span>
+                    <span class="timer-label">Дедлайн: ${task.deadline ? formatCustomDate(task.deadline) : 'Немає'}</span>
                     <span class="timer-value" data-task-id="${task.id}">${timerData.label}</span>
                 </div>
                 ${task.status !== 'no_task' ? `
