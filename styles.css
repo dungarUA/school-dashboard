@@ -425,6 +425,11 @@ body.light-mode .filter-list li.active {
     outline: none;
 }
 
+.sort-selector select option {
+    background-color: var(--bg-sidebar);
+    color: var(--text-primary);
+}
+
 .sort-selector::after {
     content: '\f107';
     font-family: 'Font Awesome 6 Free';
